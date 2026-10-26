@@ -33,38 +33,24 @@ int count_char(char *str, char target) {
  * 
  * Returns a pointer to an array containing each token as a string pointer.
  */
-// char **parse_list(char *input_str){
-//     char **list = NULL, **p = NULL;
-//     char *token = NULL;
-//     char *str = NULL;
-//     int num_tokens = 0;
-//     int i = 0;
+char **parse_list(char *input_str){
+    char **list = NULL;
+    char *input_copy = NULL;
+    int num_tokens = 0;
 
-//     // Make an array with space for all tokens in list (or find simple way to count number of langs count ;?)
-//     num_tokens = count_char(input_str, ';') + 1;
-//     list = malloc(num_tokens * sizeof(list));
-//     if (list == NULL) {
-//         printf("parse_list could not allocate memory for list\n");
-//         return NULL;
-//     }
-
-//     // While there are still more tokens in input, allocate memory, make string, add to array
-//     token = strtok(input_str, "[;]");
-//     i = 0;
-//     do {
-//         str = calloc(strlen(token) + 1, sizeof(char));
-//         if (str == NULL) {
-//             printf("parse_list unable to allocate memory for string\n");
-//             return NULL;
-//         }
-//         printf("parse_list allocated memory for %d strings\n", i);
-//         // strcpy(str, token);
-//         // list[i] = str;
-//         // i++;
-//     } while (strtok(NULL, "[;]"));
-
-//     return list;
-// }
+    // Copy the input string so as not to modify the original
+    input_copy = calloc(strlen(input_str) + 1, sizeof(char));
+    strcpy(input_copy, input_str);
+    // Determine how many tokens are in the input string copy
+    num_tokens = count_char(input_copy, ';') + 1;
+    printf("num_tokens = %d\n", num_tokens);
+    // Create an array that will hold pointers to the number of tokens received
+    // For each token,
+        // Get the token
+        // Create a string object that will hold a copy of the token
+        // Add pointer to the token to list
+    return list;
+}
 
 
 /* 
@@ -99,7 +85,7 @@ struct movie* create_movie(char *movie_str){
 
     token = strtok(NULL, ",");
     curr_movie->languages = NULL;
-    // parse_list(token);
+    parse_list(token);
     printf("Languages: %s\n", token);
     // curr_movie->languages = parse_list(token);
 
