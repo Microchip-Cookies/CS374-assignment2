@@ -9,7 +9,7 @@
 struct movie {
     char *title;
     int year;
-    char **languages;
+    char *languages;
     double rating;
 };
 
@@ -23,33 +23,6 @@ int count_char(char *str, char target) {
         }
     }
     return count;
-}
-
-/* 
- * Function: parse_list
- * 
- * Receives a string with one or more tokens separated by semicolons and enclosed in square brackets: 
- *  [token_1;token_2 ... token_n]
- * 
- * Returns a pointer to an array containing each token as a string pointer.
- */
-char **parse_list(char *input_str){
-    char **list = NULL;
-    char *input_copy = NULL;
-    int num_tokens = 0;
-
-    // Copy the input string so as not to modify the original
-    input_copy = calloc(strlen(input_str) + 1, sizeof(char));
-    strcpy(input_copy, input_str);
-    // Determine how many tokens are in the input string copy
-    num_tokens = count_char(input_copy, ';') + 1;
-    printf("num_tokens = %d\n", num_tokens);
-    // Create an array that will hold pointers to the number of tokens received
-    // For each token,
-        // Get the token
-        // Create a string object that will hold a copy of the token
-        // Add pointer to the token to list
-    return list;
 }
 
 
@@ -80,20 +53,19 @@ struct movie* create_movie(char *movie_str){
     curr_movie->title = calloc(strlen(token) + 1, sizeof(char));
     strcpy(curr_movie->title, token);
 
+    // Set movie year
     token = strtok(NULL, ",");
     curr_movie->year = strtol(token, NULL, 10);
 
+    // Set movie languages
     token = strtok(NULL, ",");
-    curr_movie->languages = NULL;
-    parse_list(token);
-    printf("Languages: %s\n", token);
-    // curr_movie->languages = parse_list(token);
+    curr_movie->languages = calloc(strlen(token) + 1, sizeof(char));
+    strcpy(curr_movie->languages, token);
 
-    // Copy the value of state into the member state in the structure
+    // Set movie rating
     token = strtok(NULL, ",");
     curr_movie->rating = strtod(token, NULL);
-
-    // Set the next node to NULL in the newly created movie entry
+    
     return curr_movie;
 }
 
@@ -124,7 +96,7 @@ struct movie* create_movie(char *movie_str){
     {
         // new_movie = *create_movie(currLine);
         new_movie = create_movie(currLine);
-        printf("Title: %s ", new_movie->title);
+        printf("Title: %s Year: %d Langs: %s Rating: %g", new_movie->title, new_movie->year, new_movie->languages, new_movie->rating);
         // for (i=0; new_movie.languages[i]; i++) {
         //     // printf("%s ", (char) new_movie.languages[i]);
         //     puts(new_movie.languages);
