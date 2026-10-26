@@ -11,6 +11,7 @@ struct movie {
     int year;
     char *languages;
     double rating;
+    struct movie *next;
 };
 
 int count_char(char *str, char target) {
@@ -40,6 +41,7 @@ struct movie* create_movie(char *movie_str){
     char **languages = NULL;
     char *token = NULL;
     struct movie *curr_movie = NULL;
+    struct movie *next = NULL;
 
     // Allocate memory for the movie structure
     curr_movie = malloc(sizeof(struct movie));
@@ -65,6 +67,9 @@ struct movie* create_movie(char *movie_str){
     // Set movie rating
     token = strtok(NULL, ",");
     curr_movie->rating = strtod(token, NULL);
+
+    // Set next node to NULL
+    curr_movie->next = NULL;
     
     return curr_movie;
 }
@@ -78,11 +83,13 @@ struct movie* create_movie(char *movie_str){
  *  
  *  This function was adapted from the sample provided to the class.
  */
- void processMovieFile(char* filePath){
+ struct movie *processMovieFile(char* filePath){
     char *currLine = NULL;
     size_t len = 0;
     int num_read = 0;
-    struct movie *new_movie;
+    struct movie *new_movie = NULL;
+    struct movie *first = NULL;
+    struct movie *last = NULL;
     int i = 0;
 
     // Open the specified file for reading only
@@ -96,12 +103,18 @@ struct movie* create_movie(char *movie_str){
     {
         // new_movie = *create_movie(currLine);
         new_movie = create_movie(currLine);
-        printf("Title: %s Year: %d Langs: %s Rating: %g", new_movie->title, new_movie->year, new_movie->languages, new_movie->rating);
-        // for (i=0; new_movie.languages[i]; i++) {
-        //     // printf("%s ", (char) new_movie.languages[i]);
-        //     puts(new_movie.languages);
-        // }
-        printf("\n");
+        if (first == NULL) {
+            first = new_movie;
+            last = new_movie;
+        }
+        last->next = new_movie;
+        last = new_movie;
+        // // QA output
+        // printf("%-40s %d %-45s %g", new_movie->title, new_movie->year, new_movie->languages, new_movie->rating);
+        // printf("\n");
+
+        // Add to linked list
+
         num_read++;
     }
 
@@ -110,6 +123,7 @@ struct movie* create_movie(char *movie_str){
     // Close the file
     fclose(movieFile);
     printf("Processed file %s and parsed data for %d movies\n", filePath, num_read);
+    return first;
 }
 
 
@@ -117,12 +131,22 @@ struct movie* create_movie(char *movie_str){
  * 
  */
 int main ( int argc, char **argv ){
+    struct movie *movies = NULL;
+    struct movie *curr_node = NULL;
     if (argc < 2)
     {
         printf("You must provide the name of the file to process\n");
         printf("Example usage: ./movies movies.csv\n");
         return EXIT_FAILURE;
     }
-    processMovieFile(argv[1]);
+    movies = processMovieFile(argv[1]);
+    curr_node = movies;
+    printf("The first movie is \"%s\"\n", curr_node->title);
+    curr_node = curr_node->next;
+    printf("The second movie is \"%s\"\n", curr_node->title);
+    while (curr_node->next != NULL){
+        curr_node = curr_node->next;
+    }
+    printf("The last movie is \"%s\"\n", curr_node->title);
     return EXIT_SUCCESS;
 }
