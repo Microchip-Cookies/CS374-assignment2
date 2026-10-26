@@ -126,6 +126,93 @@ struct movie* create_movie(char *movie_str){
     return first;
 }
 
+int has_lang(struct movie *curr_movie, char *lang) {
+    char *lang_str = NULL;
+    char *token = NULL;
+
+    lang_str = calloc(strlen(curr_movie->languages) + 1, sizeof(char));
+    if (lang_str == NULL) {
+        printf("Error allocating memory");
+    }
+    strcpy(lang_str, curr_movie->languages);
+    token = malloc(strlen(lang_str) * sizeof(char));
+    if (token == NULL) {
+        printf("Error allocating memory");
+    }
+
+    token = strtok(lang_str, "[];");
+    do {
+        if (strcmp(token, lang) == 0) {
+            return 1;
+        }
+    } while (token = strtok(NULL, "[];"));
+
+    return 0;
+}
+
+void show_by_lang(struct movie *movies) {
+    char lang[21] = {0};
+    int num_movies = 0;
+    struct movie *curr_movie = movies;
+
+    // What lang?
+    printf("Enter the language for which you want to see movies: ");
+    scanf("%s", lang);
+    ("%*[^\n]");
+    // If the current movie has the specified language, print its year and title
+    while (curr_movie != NULL) {
+        if (has_lang(curr_movie, lang)) {
+            printf("%d %s\n", curr_movie->year, curr_movie->title);
+            num_movies++;
+        }
+        curr_movie = curr_movie->next;
+    }
+    if (num_movies == 0) {
+        printf("No data about movies released in %s\n", lang);
+    }
+}
+
+
+void show_best(struct movie *movies) {
+    struct movie *best[2026-1900] = {NULL};
+    struct movie *curr_movie = movies;
+    int i = 0;
+
+    while (curr_movie != NULL) {
+        i = curr_movie->year - 1900;
+        if (best[i] == NULL || best[i]->rating < curr_movie->rating) {
+            best[i] = curr_movie;
+        }
+        curr_movie = curr_movie->next;
+    }
+    for (i=0; i<(2026-1900); i++) {
+        if (best[i]) {
+            printf("%d %.1f %s\n", best[i]->year, best[i]->rating, best[i]->title);
+        }
+    }
+    
+}
+
+void show_by_year(struct movie *movies){
+    int year = 0;
+    int has_movies = 0;
+    struct movie *curr_movie = movies;
+
+    printf("Enter the year for which you want to see movies: ");
+    scanf(" %d", &year);
+    ("%*[^\n]");
+
+    while (curr_movie != NULL){
+        if (curr_movie->year == year) {
+            printf("%s\n", curr_movie->title);
+            has_movies = 1;
+        }
+        curr_movie = curr_movie->next;
+    }
+    if (!has_movies) {
+        printf("No data about movies released in the year %d\n", year);
+    }
+}
 
 /**
  * 
@@ -133,6 +220,8 @@ struct movie* create_movie(char *movie_str){
 int main ( int argc, char **argv ){
     struct movie *movies = NULL;
     struct movie *curr_node = NULL;
+    int selection = 0;
+
     if (argc < 2)
     {
         printf("You must provide the name of the file to process\n");
@@ -141,12 +230,25 @@ int main ( int argc, char **argv ){
     }
     movies = processMovieFile(argv[1]);
     curr_node = movies;
-    printf("The first movie is \"%s\"\n", curr_node->title);
-    curr_node = curr_node->next;
-    printf("The second movie is \"%s\"\n", curr_node->title);
-    while (curr_node->next != NULL){
-        curr_node = curr_node->next;
+
+    while (selection != 4) {
+        printf("%s", "\n1. Show movies released in the specified year\n");
+        puts("2. Show highest rated movie for each year");
+        puts("3. Show the title and year of release of all movies in a specific language");
+        puts("4. Exit from the program");
+        puts("");
+        printf("Enter a choice from 1 to 4: ");
+        scanf("%d", &selection);
+        scanf("%*[^\n]");
+        if (selection > 4 || selection < 1) {
+            puts("You entered an incorrect choice. Try again.");
+        }
+        switch (selection) {
+            case 1: show_by_year(movies); break;
+            case 2: show_best(movies); break;
+            case 3: show_by_lang(movies); break;
+        }
     }
-    printf("The last movie is \"%s\"\n", curr_node->title);
+    
     return EXIT_SUCCESS;
 }
