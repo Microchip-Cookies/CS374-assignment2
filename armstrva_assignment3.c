@@ -1,20 +1,113 @@
 #include <stdio.h>
 #include <stdlib.h> // for EXIT_SUCCESS and EXIT_FAILURE
 #include <stdbool.h>
+#include <dirent.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+bool isMovieFile(const struct dirent *inputFile) {
+    // char *fileName = inputFile->d_name;
+    char prefix[] = "movies_";
+    char fileExt[] = ".csv";
+    int i = 0, j = 0;
+
+    for(i=0; i<strlen(prefix); i++) {
+        if(inputFile->d_name[i] == '\0' | prefix[i] != inputFile->d_name[i]) {
+            return false;
+        }
+    }
+
+    for(i=strlen(fileExt) -1, j=strlen(inputFile->d_name) - 1; i >= 0; i--, j--) {
+        if(fileExt[i] != inputFile->d_name[j]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void processMovieFile(char *fileName) {
+    printf("Now processing the chosen file named %s.\n", fileName);
+}
 
 void processNamed(void){
-    puts("Process file named ____");
+    puts("Process by name not yet implemented.");
+    // char *fileName = NULL;
+    // processMovieFile(fileName);
 }
 
 void processSmallest(void){
-    puts("Process smallest");
+    DIR *currDir = opendir(".");
+    struct dirent *entry = NULL;
+    struct stat entryStat;
+    off_t smSize = 0;
+    char *smName = NULL;
+
+
+    // For each file in the current directory that starts with "movies_" w/ .csv, if file > largest, largest = file
+    currDir = opendir(".");
+    while((entry = readdir(currDir)) != NULL) {
+        if(isMovieFile(entry)) {
+            if (smName == NULL) {
+                smName = entry->d_name;
+                stat(smName, &entryStat);
+                smSize = entryStat.st_size;
+            } else {
+                stat(entry->d_name, &entryStat);
+                if(entryStat.st_size < smSize) {
+                    smName = entry->d_name;
+                    smSize = entryStat.st_size;
+                }
+            }
+        }
+    }
+    processMovieFile(smName);
+    closedir(currDir);
 }
 
+/*
+ * processLargest
+ * 
+ * Identifies the largest movie file in the current directory and passes its file name (path) to a helper
+ * function to process.
+ */
 void processLargest(void){
-    puts("Process largest");
+    DIR* currDir = NULL;
+    struct dirent *entry = NULL;
+    struct stat entryStat;
+    off_t lgSize = 0;
+    char *lgName = NULL;
+
+
+    // For each file in the current directory that starts with "movies_" w/ .csv, if file > largest, largest = file
+    currDir = opendir(".");
+    while((entry = readdir(currDir)) != NULL) {
+        if(isMovieFile(entry)) {
+            if (lgName == NULL) {
+                lgName = entry->d_name;
+                stat(lgName, &entryStat);
+                lgSize = entryStat.st_size;
+            } else {
+                stat(entry->d_name, &entryStat);
+                if(entryStat.st_size > lgSize) {
+                    lgName = entry->d_name;
+                    lgSize = entryStat.st_size;
+                }
+            }
+        }
+    }
+    processMovieFile(lgName);
+    closedir(currDir);
 }
 
-void processMovieFile(void) {
+/*
+ * openProcessMenu
+ *
+ * Presents the user with menu options for file processing. Calls the appropriate helper depending
+ * on user selection.
+ */
+void openProcessMenu(void) {
     int choice = 0;
 
     /* Process File Menu*/
@@ -56,7 +149,7 @@ int main (void){
         scanf("%*[^\n]");
 
         switch(choice){
-            case 1: processMovieFile(); break;
+            case 1: openProcessMenu(); break;
             case 2: return EXIT_SUCCESS;
             default: puts("You entered an incorrect choice. Try again.");
         }
