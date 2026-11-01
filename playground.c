@@ -1,82 +1,94 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-char **make_str_array(int n) {
-    char **str_arr = NULL, **p = NULL, *str = NULL;
-    int i = 0;
 
-    str_arr = malloc(sizeof(str_arr) * n);
-    if (str_arr == NULL) {
-        printf("make_str_array failed to allocate memory for list\n");
-        return NULL;
-    }
+void main(void) {
+    char buff[100];
+    puts("Enter a file name.");
+    fgets(buff, sizeof(buff), stdin);
+    printf("You entered %s.\n", buff);
+
+}
+
+
+
+// char **make_str_array(int n) {
+//     char **str_arr = NULL, **p = NULL, *str = NULL;
+//     int i = 0;
+
+//     str_arr = malloc(sizeof(str_arr) * n);
+//     if (str_arr == NULL) {
+//         printf("make_str_array failed to allocate memory for list\n");
+//         return NULL;
+//     }
     
-    p = str_arr;
-    for (i=0; i < n; i++) {
-        str = calloc(100, sizeof(char));
-        if (str == NULL) {
-            printf("Unable to allocate memory for string.");
-        }
-        sprintf(str, "foobar %d", i);
-        str_arr[i] = str;
-    }
+//     p = str_arr;
+//     for (i=0; i < n; i++) {
+//         str = calloc(100, sizeof(char));
+//         if (str == NULL) {
+//             printf("Unable to allocate memory for string.");
+//         }
+//         sprintf(str, "foobar %d", i);
+//         str_arr[i] = str;
+//     }
 
   
-    return str_arr;
+//     return str_arr;
 
-}
+// }
 
-int *make_int_array(int n) {
-    int *arr = (int *) malloc(sizeof(int) * n);
-    int *p = arr;
-    int i = 0;
+// int *make_int_array(int n) {
+//     int *arr = (int *) malloc(sizeof(int) * n);
+//     int *p = arr;
+//     int i = 0;
 
-    if (arr == NULL) {
-        printf("make_int_array failed to allocate memory.\n");
-    }
-    for (i=0; i < n; i++) {
-        *p = 3 + i;
-        p++;
-    }
-    return arr;
-}
+//     if (arr == NULL) {
+//         printf("make_int_array failed to allocate memory.\n");
+//     }
+//     for (i=0; i < n; i++) {
+//         *p = 3 + i;
+//         p++;
+//     }
+//     return arr;
+// }
 
-int main(void) {
-    int *my_arr = NULL;
-    int *p = NULL;
-    char **my_strings = NULL;
-    char **q = NULL;
-    int i = 0;
-    int n = 5;
+// int main(void) {
+//     int *my_arr = NULL;
+//     int *p = NULL;
+//     char **my_strings = NULL;
+//     char **q = NULL;
+//     int i = 0;
+//     int n = 5;
 
-    // Create and print an integer array with n numbers
-    my_arr = make_int_array(n);
-    if (my_arr == NULL) {
-        printf("Failed to create array.\n");
-        return 1;
-    }
-    printf("Integer array created: [");
-    p = my_arr;
-    for (i=0; i < n; i++){
-        printf("%d, ", *p);
-        p++;
-    }
-    puts("]");
+//     // Create and print an integer array with n numbers
+//     my_arr = make_int_array(n);
+//     if (my_arr == NULL) {
+//         printf("Failed to create array.\n");
+//         return 1;
+//     }
+//     printf("Integer array created: [");
+//     p = my_arr;
+//     for (i=0; i < n; i++){
+//         printf("%d, ", *p);
+//         p++;
+//     }
+//     puts("]");
 
-    // Create and print array of strings
-    my_strings = make_str_array(n);
-    if (my_strings == NULL) {
-        printf("Failed to create string array.");
-        return 1;
-    }
+//     // Create and print array of strings
+//     my_strings = make_str_array(n);
+//     if (my_strings == NULL) {
+//         printf("Failed to create string array.");
+//         return 1;
+//     }
     
-    for (i=0; i < n; i++) {
-        printf("str_array element %d contains %s\n", i, my_strings[i]);
-    }
+//     for (i=0; i < n; i++) {
+//         printf("str_array element %d contains %s\n", i, my_strings[i]);
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 
