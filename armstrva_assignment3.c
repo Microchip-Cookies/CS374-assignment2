@@ -11,6 +11,9 @@
 
 bool isInCurrentDirectory(char *fileName) ;
 
+/* 
+ * Reused from my Assignment 2 code 
+ */
 struct movie {
     char *title;
     int year;
@@ -27,6 +30,7 @@ struct movie {
  *  Ex: Monty Python and the Holy Grail,1975,[English,French],8.1
  * Creates a movie struct and returns a pointer to the newly created movie. Returns NULL if
  * unable to create movie.
+ * Reused from my Assignment 2 code
  */
 struct movie *create_movie(char *movie_str){
 // struct movie* create_movie(char *movie_string){
@@ -93,7 +97,6 @@ struct movie *create_movie(char *movie_str){
     // Read the data line by line
     while(getline(&currLine, &len, movieFile) != -1)
     {
-        // new_movie = *create_movie(currLine);
         new_movie = create_movie(currLine);
         if (first == NULL) {
             first = new_movie;
@@ -109,7 +112,7 @@ struct movie *create_movie(char *movie_str){
 
     // Close the file
     fclose(movieFile);
-    printf("Processed file %s and parsed data for %d movies\n", filePath, num_read);
+    free(new_movie);
     return first;
 }
 
@@ -193,7 +196,7 @@ void makeMovieFiles(struct movie *movies, char *dirName) {
         sprintf(filePath, "%s%s", yearAsString, ".txt");
 
         // Get movie title
-        movieLine = malloc(sizeof(char) * (strlen(currMovie->title) + 1));
+        movieLine = malloc(sizeof(char) * (strlen(currMovie->title) + 2));
         sprintf(movieLine, "%s\n", currMovie->title);
 
         // If no file yet exists for that year, make one and write the title of the movie to it.
@@ -228,7 +231,7 @@ void processMovieFile(char *fileName) {
     // Create new directory with rwxr-x--- permissions
     newDirName = getMovieDirName();
     mkdir(newDirName, 0750);
-    printf("Created directory with name %s\n", newDirName);
+    printf("Created directory with name %s\n\n", newDirName);
 
     // Make new files for movie details in the new directory
     movies = getMovies(fileName);
@@ -289,7 +292,7 @@ void processSmallest(void){
     char *smName = NULL;
 
 
-    // For each file in the current directory that starts with "movies_" w/ .csv, if file > largest, largest = file
+    // For each file in the current directory that starts with "movies_" w/ .csv, if file length < smallest, smallest = file
     currDir = opendir(".");
     while((entry = readdir(currDir)) != NULL) {
         if(isMovieFile(entry)) {
