@@ -6,6 +6,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+bool isInCurrentDirectory(char *fileName) ;
 
 struct movie {
     char *title;
@@ -24,7 +28,7 @@ struct movie {
  * Creates a movie struct and returns a pointer to the newly created movie. Returns NULL if
  * unable to create movie.
  */
-struct movie* create_movie(char *movie_str){
+struct movie *create_movie(char *movie_str){
 // struct movie* create_movie(char *movie_string){
     char **languages = NULL;
     char *token = NULL;
@@ -64,11 +68,12 @@ struct movie* create_movie(char *movie_str){
 
 /*
  * Function: getMovies
- *   Opens a file, reads and prints each line
- *   filePath: path to the file
- * 
+ *   
+ * Opens the specified movie file. For each line, creates a movie struct and
+ * adds it to a linked list of movie structs. Returns the first struct in the list.
  *  
- *  This function was adapted from the sample provided to the class.
+ *  This function was adapted from my solution for assignment 2, which
+ *  was an adaptatino of the sample provided to the class for assignment 2.
  */
  struct movie *getMovies(char* filePath){
     char *currLine = NULL;
@@ -96,25 +101,18 @@ struct movie* create_movie(char *movie_str){
         }
         last->next = new_movie;
         last = new_movie;
-        // // QA output
-        // printf("%-40s %d %-45s %g", new_movie->title, new_movie->year, new_movie->languages, new_movie->rating);
-        // printf("\n");
 
         // Add to linked list
 
         num_read++;
     }
 
-    // Free the memory allocated by getline for currLine
-    free(currLine);
     // Close the file
     fclose(movieFile);
     printf("Processed file %s and parsed data for %d movies\n", filePath, num_read);
     return first;
 }
 
-
-bool isInCurrentDirectory(char *fileName);
 
 /*
  * isMovieFile
@@ -143,20 +141,20 @@ bool isMovieFile(const struct dirent *inputFile) {
     return true;
 }
 
-
-char *makeMovieDirectory(void) {
-    char dirName[275];
-    char *intAsStr;
-
-
-}
-
-// Information about using rand from W3 Schools "C stdlib rand() function" https://www.w3schools.com/c/ref_stdlib_rand.php
-void processMovieFile(char *fileName) {
-    char dirName[275];
-    char *intAsStr;
-
-    printf("Now processing the chosen file named %s.\n", fileName);
+/*
+ * getMovieDirName
+ * 
+ * Create a sub-directory name that is unique within the current directory. Name should be in the form:
+ * ONID.movies.num where num is a random number between 0 and 99999.
+ * 
+ * returns a pointer to the name string.
+ * 
+ * Information about using rand from W3 Schools "C stdlib rand() function" https://www.w3schools.com/c/ref_stdlib_rand.php
+ * Portions modeled after code from "How to Return An Array From A Functin in C" by Portfolio Courses, https://www.youtube.com/watch?v=uI1J8o1rY10
+ */
+char *getMovieDirName(void) {
+    char *dirName = malloc(sizeof(char) * (strlen("armstrva.movies.99999") + 1));
+    char *intAsStr = malloc(sizeof(char) * 7);
 
     // Make a new directory
     do {
@@ -168,11 +166,71 @@ void processMovieFile(char *fileName) {
 
         // ensure it is unique in this directory
     } while(isInCurrentDirectory(dirName) == true);
+    
+    free(intAsStr);
+    return dirName;
+}
 
-    mkdir(dirName, 0750);
+/*
+ * makeMovieFiles
+ * 
+ * Receives the first movie struct in a linked list of movie structs. For each year in the file where at least one movie was made, 
+ * creates a file for that year and populates it with the titles of all movies listed for that year.
+ */
+void makeMovieFiles(struct movie *movies, char *dirName) {
+    struct movie *currMovie = movies;
+    char *yearAsString = malloc(sizeof(char) * 5);
+    char *filePath = malloc(sizeof(char) * 15);  // "YYYY.txt\0"
+    int fileDescriptor = 0;
 
-    // Make new files
+    chdir(dirName);
 
+    while(currMovie != NULL) {
+        // Set file path
+        sprintf(yearAsString, "%d", currMovie->year);
+        sprintf(filePath, "%s%s", yearAsString, ".txt");
+
+        printf("File name: %s\n", filePath);
+        // If no file yet exists for that year, make one and write the title of the movie to it.
+        if(isInCurrentDirectory(filePath) != true) {
+            fileDescriptor = open(filePath, O_WRONLY | O_CREAT, 0640);
+        } else {
+            printf("%s is already in directory", filePath);
+        }
+        // If a file already exists for that year, open it and append the movie's title to it. 
+        currMovie = currMovie->next;
+    }
+
+    // closedir(dirName);
+    free(filePath);
+}
+
+void processMovieFile(char *fileName) {
+    char *newDirName;
+    char *intAsStr;
+    struct movie *movies = NULL;
+    struct movie *currMovie = NULL;
+    struct movie *prevMovie = NULL;
+
+    printf("Now processing the chosen file named %s.\n", fileName);
+
+    // Create new directory with rwxr-x--- permissions
+    newDirName = getMovieDirName();
+    mkdir(newDirName, 0750);
+    printf("Created directory with name %s\n", newDirName);
+
+    // Make new files for movie details in the new directory
+    movies = getMovies(fileName);
+    makeMovieFiles(movies, newDirName);
+
+    free(newDirName);
+    currMovie = movies;
+    while(currMovie->next != NULL) {
+        prevMovie = currMovie;
+        currMovie = currMovie->next;
+        free(prevMovie);
+    }
+    free(currMovie);
 }
 
 bool isInCurrentDirectory(char *fileName) {
