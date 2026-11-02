@@ -2,15 +2,62 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
+
+// Return an array (as pointer) from a function
+void makeArr(int *inputArr, int lenInputArr) {
+
+    for (int i=0; i < lenInputArr; i++) {
+        inputArr[i] = i;
+    }
+}
 
 void main(void) {
-    char buff[100];
-    puts("Enter a file name.");
-    fgets(buff, sizeof(buff), stdin);
-    printf("You entered %s.\n", buff);
+    int maxLen = 10;
+    int myArr[maxLen];
 
+    makeArr(myArr, maxLen);
+    for(int i=0; i<maxLen; i++) {
+        printf("Array [%d] = %d\n", i, myArr[i]);
+    }
 }
+
+// // Concatenate strings
+// void main(void) {
+//     char *str1;
+//     char *str2;
+
+//     strcpy(str1, "Testing");
+//     strcpy(str2, "1,2,3");
+//     strcat(str1, " ");
+//     strcat(str1, str2);
+//     puts(str1);
+
+//     strcpy(str1, str2);
+//     puts(str1);
+// }
+
+
+
+// Success: prints 20 integers between 0 and 3 (note rand is % 3 + 1 or %4)
+// void main(void) {
+//     srand(time(NULL));
+
+//     for (int i=0; i < 20; i++) {
+//         printf("%d\n", rand() % 4);
+//     }
+// }
+
+
+// Successful: read into a buffer using fgets()
+// void main(void) {
+//     char buff[100];
+//     puts("Enter a file name.");
+//     fgets(buff, sizeof(buff), stdin);
+//     printf("You entered %s.\n", buff);
+
+// }
 
 
 
