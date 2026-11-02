@@ -181,7 +181,9 @@ void makeMovieFiles(struct movie *movies, char *dirName) {
     struct movie *currMovie = movies;
     char *yearAsString = malloc(sizeof(char) * 5);
     char *filePath = malloc(sizeof(char) * 15);  // "YYYY.txt\0"
+    char *movieLine;
     int fileDescriptor = 0;
+    int numChars = 0;
 
     chdir(dirName);
 
@@ -190,19 +192,28 @@ void makeMovieFiles(struct movie *movies, char *dirName) {
         sprintf(yearAsString, "%d", currMovie->year);
         sprintf(filePath, "%s%s", yearAsString, ".txt");
 
-        printf("File name: %s\n", filePath);
+        // Get movie title
+        movieLine = malloc(sizeof(char) * (strlen(currMovie->title) + 1));
+        sprintf(movieLine, "%s\n", currMovie->title);
+
         // If no file yet exists for that year, make one and write the title of the movie to it.
         if(isInCurrentDirectory(filePath) != true) {
             fileDescriptor = open(filePath, O_WRONLY | O_CREAT, 0640);
-        } else {
-            printf("%s is already in directory", filePath);
-        }
+            numChars = write(fileDescriptor, movieLine, strlen(movieLine));
+            close(fileDescriptor);
         // If a file already exists for that year, open it and append the movie's title to it. 
+        } else {
+            fileDescriptor = open(filePath, O_WRONLY | O_APPEND);
+            numChars = write(fileDescriptor, movieLine, strlen(movieLine));
+            close(fileDescriptor);
+        }
         currMovie = currMovie->next;
+        free(movieLine);
     }
 
     // closedir(dirName);
     free(filePath);
+    free(yearAsString);
 }
 
 void processMovieFile(char *fileName) {
