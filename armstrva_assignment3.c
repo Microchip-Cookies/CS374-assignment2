@@ -98,21 +98,19 @@ struct movie *create_movie(char *movie_str){
     while(getline(&currLine, &len, movieFile) != -1)
     {
         new_movie = create_movie(currLine);
+        // Add to linked list
         if (first == NULL) {
             first = new_movie;
-            last = new_movie;
+        } else {
+            last->next = new_movie;
         }
-        last->next = new_movie;
         last = new_movie;
-
-        // Add to linked list
 
         num_read++;
     }
 
     // Close the file
     fclose(movieFile);
-    free(new_movie);
     return first;
 }
 
@@ -214,7 +212,7 @@ void makeMovieFiles(struct movie *movies, char *dirName) {
         free(movieLine);
     }
 
-    // closedir(dirName);
+    chdir("../");
     free(filePath);
     free(yearAsString);
 }
@@ -226,7 +224,7 @@ void processMovieFile(char *fileName) {
     struct movie *currMovie = NULL;
     struct movie *prevMovie = NULL;
 
-    printf("Now processing the chosen file named %s.\n", fileName);
+    printf("Now processing the chosen file named %s\n", fileName);
 
     // Create new directory with rwxr-x--- permissions
     newDirName = getMovieDirName();
@@ -269,6 +267,7 @@ bool isInCurrentDirectory(char *fileName) {
  */
 int processNamed(void){
     char *fileName;
+    fileName = malloc(sizeof(char) * 257);
 
     // Get the file name from the user
     printf("Enter the complete file name: ");
@@ -277,10 +276,11 @@ int processNamed(void){
     if(isInCurrentDirectory(fileName)) {
         processMovieFile(fileName);
     } else {
-        printf("The file %s was not found. Try again", fileName);
+        printf("The file %s was not found. Try again\n", fileName);
         return -1;
     }
 
+    free(fileName);
     return 1;
 }
 
@@ -415,11 +415,11 @@ int main (void){
 
     /*Main Menu*/
     while(true) {
-        puts("1. Select the file to process");
+        puts("1. Select file to process");
         puts("2. Exit the program\n");
-        puts("Enter a choice 1 or 2: ");
+        printf("Enter a choice 1 or 2: ");
         scanf("%d", &choice);
-        scanf("%*[^\n]");
+        scanf("%*[^\n]"); // clear the input stream
 
         switch(choice){
             case 1: openProcessMenu(); break;
