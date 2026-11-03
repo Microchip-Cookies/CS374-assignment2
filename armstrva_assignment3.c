@@ -9,7 +9,56 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-bool isInCurrentDirectory(char *fileName) ;
+struct movie;
+bool isInCurrentDirectory(char *fileName);
+bool isMovieFile(const struct dirent *inputFile);
+struct movie *create_movie(char *movie_str);
+struct movie *getMovies(char* filePath);
+char *getMovieDirName(void);
+void makeMovieFiles(struct movie *movies, char *dirName);
+void processMovieFile(char *fileName);
+int processNamed(void);
+void processSmallest(void);
+void processLargest(void);
+int openProcessMenu(void);
+
+
+/**
+ * Programming Assignment 3: File Search
+ * CS374 - Operating Systems I
+ * Professor Guillermo Tonsmann
+ * Fall 2026 
+ * Oregon State University
+ * Developer: Valerie Armstrong
+ * 
+ * Description: This program process movie data from csv files. It offers the user the option of 
+ * processing the largest movie file in the current directory, the smallest, or a file with the 
+ * name selected by the user. Once selected, the program reads the data from the chosen file, creates
+ * a sub-directory; then inside that directory creates a text file for each year that has a movie represented
+ * in the data. Inside that file, it writes the titles of all the movies in the data that were released
+ * during that year.
+ */
+int main (void){
+    int choice = 0;
+    char *fileName = "";
+
+    /*Main Menu*/
+    while(true) {
+        puts("1. Select file to process");
+        puts("2. Exit the program\n");
+        printf("Enter a choice 1 or 2: ");
+        scanf("%d", &choice);
+        scanf("%*[^\n]"); // clear the input stream
+
+        switch(choice){
+            case 1: openProcessMenu(); break;
+            case 2: return EXIT_SUCCESS;
+            default: puts("You entered an incorrect choice. Try again.");
+        }
+    }  
+    return EXIT_SUCCESS;
+}
+
 
 /* 
  * Reused from my Assignment 2 code 
@@ -113,7 +162,6 @@ struct movie *create_movie(char *movie_str){
     fclose(movieFile);
     return first;
 }
-
 
 /*
  * isMovieFile
@@ -406,26 +454,3 @@ int openProcessMenu(void) {
 
 }
 
-/**
- * 
- */
-int main (void){
-    int choice = 0;
-    char *fileName = "";
-
-    /*Main Menu*/
-    while(true) {
-        puts("1. Select file to process");
-        puts("2. Exit the program\n");
-        printf("Enter a choice 1 or 2: ");
-        scanf("%d", &choice);
-        scanf("%*[^\n]"); // clear the input stream
-
-        switch(choice){
-            case 1: openProcessMenu(); break;
-            case 2: return EXIT_SUCCESS;
-            default: puts("You entered an incorrect choice. Try again.");
-        }
-    }  
-    return EXIT_SUCCESS;
-}
